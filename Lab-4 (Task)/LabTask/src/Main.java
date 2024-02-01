@@ -20,11 +20,6 @@ interface TV{
 
     void setChannel(int channel);
 
-    //This Youtube interface method has been added to implement Proxy Design pattern while Smart
-    //remote calls the showYoutube() method.Here loading of the youtube will execute for the very first time
-    //Rest of the time it won't be loaded.
-    void Youtube(YoutubeClass yt);
-
 }
 
 class SmartTV implements TV{
@@ -66,7 +61,6 @@ class SmartTV implements TV{
     public void setChannel(int channel) {
         this.channel=channel;
     }
-    @Override
     public void Youtube(YoutubeClass yt){
         System.out.println("Youtube for SmartTV::");
         yt.runYoutube();
@@ -111,11 +105,6 @@ class GeneralTV implements TV{
     @Override
     public void setChannel(int channel) {
         this.channel=channel;
-    }
-    @Override
-    public void Youtube(YoutubeClass yt){
-        System.out.println("Youtube for GeneralTV::");
-        yt.runYoutube();
     }
 }
 
@@ -188,11 +177,12 @@ class SmartRemote extends Remote{
         super(tv);
     }
     void showYoutube(YoutubeClass yt){
-        tv.Youtube(yt);
+        ((SmartTV)tv).Youtube(yt);
     }
 }
 
 //YoutubeCLass is used to implement Proxy Design method
+//For the first-time it will load youtube but further it will run itself without loading.
 interface YoutubeClass{
     void runYoutube();
 }
@@ -220,31 +210,37 @@ public class Main {
     public static void main(String[] args) {
 
 
+        //GeneralTV
+
         GeneralTV gtv=new GeneralTV();
-        SmartTV stv=new SmartTV();
         Remote remote= new Remote(gtv);
+        System.out.println("General Tv::");
         remote.togglePower();
         remote.volumeUp();
         remote.channelUp();
         remote.channelDown();
         remote.volumeDown();
 
-
-        SmartRemote sremote= new SmartRemote(gtv);
+        //SmartTV
+        System.out.println();
+        System.out.println("Smart Tv::");
+        SmartTV stv=new SmartTV();
+        SmartRemote sremote= new SmartRemote(stv);
         sremote.togglePower();
         sremote.volumeUp();
         sremote.channelUp();
         sremote.channelDown();
         sremote.volumeDown();
 
-
+        System.out.println();
+        //Youtube Class
         YoutubeClass yt=new proxyLoadYoutube();
 
         //Accessing Youtube() using smart-remote.
         sremote.showYoutube(yt);
         sremote.showYoutube(yt);
         //Direct accessing Youtube().
-        gtv.Youtube(yt);
+        //stv.Youtube(yt);
     }
 
 }
